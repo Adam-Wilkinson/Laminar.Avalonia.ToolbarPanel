@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33414.496
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{965BC66A-7EB6-403D-BCDA-D02453655E0F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Laminar.Avalonia.ToolbarPanel.Example", "examples\Laminar.Avalonia.ToolbarPanel.Example\Laminar.Avalonia.ToolbarPanel.Example.csproj", "{0FE33208-7570-4F02-93E8-A7740D95D8A5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{042346F3-D1D8-4D76-87DC-97E449508D6F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Laminar.Avalonia.ToolbarPanel", "src\Laminar.Avalonia.ToolbarPanel\Laminar.Avalonia.ToolbarPanel.csproj", "{C27F3EEB-56DA-4C26-93ED-FE726379FA7A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{171D1CC6-D1D0-48BC-9FC9-A32AC26BC50C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E7216342-A8E2-483E-855C-9F8B88E7B257}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0FE33208-7570-4F02-93E8-A7740D95D8A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FE33208-7570-4F02-93E8-A7740D95D8A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FE33208-7570-4F02-93E8-A7740D95D8A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0FE33208-7570-4F02-93E8-A7740D95D8A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C27F3EEB-56DA-4C26-93ED-FE726379FA7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C27F3EEB-56DA-4C26-93ED-FE726379FA7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C27F3EEB-56DA-4C26-93ED-FE726379FA7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C27F3EEB-56DA-4C26-93ED-FE726379FA7A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0FE33208-7570-4F02-93E8-A7740D95D8A5} = {965BC66A-7EB6-403D-BCDA-D02453655E0F}
+		{C27F3EEB-56DA-4C26-93ED-FE726379FA7A} = {042346F3-D1D8-4D76-87DC-97E449508D6F}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1D26C0F0-4B51-45FA-AA1B-0FF19A5EAF92}
+	EndGlobalSection
+EndGlobal

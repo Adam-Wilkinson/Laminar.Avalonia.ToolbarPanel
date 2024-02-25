@@ -1,0 +1,16 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:t="clr-namespace:Laminar.Avalonia.ToolbarPanel;assembly=Laminar.Avalonia.ToolbarPanel"
+		xmlns:asp="clr-namespace:Laminar.Avalonia.ToolbarPanel.AdjustableStackPanel;assembly=Laminar.Avalonia.ToolbarPanel"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="Laminar.Avalonia.ToolbarPanel.Example.MainWindow"
+        Title="Laminar.Avalonia.ToolbarPanel.Example">
+	<asp:AdjustableStackPanel Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Background="{DynamicResource ThemeBackgroundBrush}">
+		<TextBlock Padding="10,5">Hello?</TextBlock>
+		<TextBlock Padding="10,5">I Wonder what this looks like</TextBlock>
+		<TextBlock Padding="10,5">Or whether it works at all</TextBlock>
+		<TextBlock Padding="10,5">Another one to help</TextBlock>
+	</asp:AdjustableStackPanel>
+</Window>
