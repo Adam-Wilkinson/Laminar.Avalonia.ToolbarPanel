@@ -6,6 +6,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml.Styling;
+using Avalonia.Rendering;
 using Avalonia.VisualTree;
 
 namespace Laminar.Avalonia.ToolbarPanel.AdjustableStackPanel;
@@ -28,7 +29,7 @@ public class ResizeWidget : TemplatedControl
     private static readonly FrozenDictionary<ResizerMode, string> ModePseudoClasses = ResizerModeExtensions.AllModes().ToFrozenDictionary(x => x, x => ":" + x.ToString());
     private ResizerMode _mode;
     private double _size;
-    private Point? _lastMousePoint = null;
+    private Point? _originalClickPoint = null;
 
     static ResizeWidget()
     {
@@ -61,13 +62,6 @@ public class ResizeWidget : TemplatedControl
         set => SetValue(OrientationProperty, value);
     }
 
-    protected override void OnPointerPressed(PointerPressedEventArgs e)
-    {
-        _lastMousePoint = e.GetPosition(this.GetVisualParent());
-        e.Handled = true;
-        base.OnPointerPressed(e);
-    }
-
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
@@ -89,38 +83,43 @@ public class ResizeWidget : TemplatedControl
         base.OnPointerExited(e);
     }
 
+    protected override void OnPointerPressed(PointerPressedEventArgs e)
+    {
+        _originalClickPoint = e.GetPosition(this);
+        e.Handled = true;
+        base.OnPointerPressed(e);
+    }
+
     protected override void OnPointerMoved(PointerEventArgs e)
     {
-        if (!_lastMousePoint.HasValue)
+        if (!_originalClickPoint.HasValue)
         {
             base.OnPointerMoved(e);
             return;
         }
 
-        Point currentMousePoint = e.GetPosition(this.GetVisualParent());
+        Point currentMousePoint = e.GetPosition(this);
 
-        Point deltaXY = currentMousePoint - _lastMousePoint.Value;
+        Point deltaXY = currentMousePoint - _originalClickPoint.Value;
         Size = Orientation switch
         {
             Orientation.Vertical => Size + deltaXY.Y,
             Orientation.Horizontal => Size + deltaXY.X,
             _ => throw new InvalidOperationException()
         };
-
-        _lastMousePoint = currentMousePoint;
         e.Handled = true;
         base.OnPointerMoved(e);
     }
 
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
-        if (_lastMousePoint is null)
+        if (_originalClickPoint is null)
         {
             base.OnPointerReleased(e);
             return;
         }
 
-        _lastMousePoint = null;
+        _originalClickPoint = null;
 
         e.Handled = true;
         base.OnPointerReleased(e);
