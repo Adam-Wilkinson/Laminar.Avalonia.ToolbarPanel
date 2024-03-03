@@ -7,7 +7,7 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Laminar.Avalonia.ToolbarPanel.Example.MainWindow"
         Title="Laminar.Avalonia.ToolbarPanel.Example">
-	<asp:AdjustableStackPanel Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Background="{DynamicResource ThemeBackgroundBrush}">
+	<asp:AdjustableStackPanel Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="{DynamicResource ThemeBackgroundBrush}">
 		<TextBlock Padding="10,5">Hello?</TextBlock>
 		<TextBlock Padding="10,5">I Wonder what this looks like</TextBlock>
 		<TextBlock Padding="10,5">Or whether it works at all</TextBlock>

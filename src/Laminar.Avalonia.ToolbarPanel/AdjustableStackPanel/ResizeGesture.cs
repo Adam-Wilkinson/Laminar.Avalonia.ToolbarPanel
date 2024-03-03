@@ -165,13 +165,13 @@ public readonly record struct ResizeGesture(Resize[] Resizes, ResizerMode Mode, 
 
     public readonly double Execute<T>(IList<T> resizeElements, int activeResizerIndex, double resizeAmount, Span<double> spaceBeforeResizers, double spaceToExpandInto, IResizingHarness<T> harness, ResizeFlags currentResizeFlags)
     {
-        double spaceToExpandIntoBefore = spaceToExpandInto;
+        double changeInStackSize = 0;
         foreach ((int indexOfCurrentResize, Resize resize) in AccessibleResizes(resizeElements, activeResizerIndex))
         {
-            spaceToExpandInto -= resize.Execute(resizeElements, harness, resizeAmount, spaceToExpandInto, indexOfCurrentResize, activeResizerIndex, spaceBeforeResizers, Flags & currentResizeFlags);
+            changeInStackSize += resize.Execute(resizeElements, harness, resizeAmount, spaceToExpandInto, indexOfCurrentResize, activeResizerIndex, spaceBeforeResizers, Flags & currentResizeFlags);
+            spaceToExpandInto -= changeInStackSize;
         }
-
-        return spaceToExpandInto - spaceToExpandIntoBefore;
+        return changeInStackSize;
     }
 
     private static double Scale(double input, double originalSpace, double currentSpace)

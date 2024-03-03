@@ -4,7 +4,6 @@ using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Reactive;
 using Avalonia.VisualTree;
-using System.Diagnostics;
 
 namespace Laminar.Avalonia.ToolbarPanel.AdjustableStackPanel;
 
@@ -35,8 +34,6 @@ public class AdjustableStackPanel : StackPanel
 
         adjustableStackPanel._measureChanging = true;
         adjustableStackPanel._currentResizeAmount = e.NewValue.GetValueOrDefault() - e.OldValue.GetValueOrDefault();
-
-        Debug.WriteLine($"Resized by {adjustableStackPanel._currentResizeAmount}");
 
         resizer.Size = e.OldValue.GetValueOrDefault();
         adjustableStackPanel.InvalidateMeasure();
@@ -188,7 +185,6 @@ public class AdjustableStackPanel : StackPanel
         double spaceToExpandInto = totalSlotSpace;
         double maximumStackDesiredWidth = 0.0;
         Span<double> totalResizableSpaces = stackalloc double[children.Count];
-        Debug.WriteLine($"Stack Size Before Resize: {DesiredSize}");
 
         if (CurrentStackResizeFlags().HasFlag(ResizeFlags.CanConsumeSpaceBeforeStack))
         {
@@ -229,8 +225,6 @@ public class AdjustableStackPanel : StackPanel
 
         _currentResizeAmount = null;
         _measureChanging = false;
-        Debug.WriteLine($"Stack Size After Resize: {totalSlotSpace - spaceToExpandInto}");
-        Debug.WriteLine("");
         return isHorizontal ? new Size(availableSize.Width - spaceToExpandInto, maximumStackDesiredWidth) : new Size(maximumStackDesiredWidth, availableSize.Height - spaceToExpandInto);
     }
 

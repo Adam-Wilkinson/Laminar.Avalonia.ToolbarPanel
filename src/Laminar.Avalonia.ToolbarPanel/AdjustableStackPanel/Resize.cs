@@ -2,44 +2,84 @@
 
 public readonly record struct Resize(int IndexOffset, ResizeAmountTransformation ResizeAmountTransformation, ResizerMode ResizerMode)
 {
-    public readonly double Execute<T>(IList<T> resizeElements, IResizingHarness<T> resizeHarness, double resizeAmount, double spaceToExpandInto, int indexOfCurrentResize, int activeResizerIndex, Span<double> spaceBeforeResizers, ResizeFlags flags)
+    public readonly double Execute<T>(IList<T> resizeElements, IResizingHarness<T> resizeHarness, double resizeAmount, double spaceToExpandInto, int indexOfCurrentResizer, int activeResizerIndex, Span<double> spaceBeforeResizers, ResizeFlags flags)
     {
-        double spaceBeforeResizer = indexOfCurrentResize < 0 ? 0 : spaceBeforeResizers[indexOfCurrentResize];
+        double spaceBeforeResizer = indexOfCurrentResizer < 0 ? 0 : spaceBeforeResizers[indexOfCurrentResizer];
         double spaceAfterResizer = spaceBeforeResizers[^1] - spaceBeforeResizer;
 
-        double currentResizeAmount = ResizeAmountTransformation(resizeAmount, activeResizerIndex < 0 ? 0 : spaceBeforeResizers[activeResizerIndex], spaceBeforeResizer, spaceBeforeResizers[^1]);
+        double requestedResizerPositionChange = ResizeAmountTransformation(resizeAmount, activeResizerIndex < 0 ? 0 : spaceBeforeResizers[activeResizerIndex], spaceBeforeResizer, spaceBeforeResizers[^1]);
 
         if (ResizerMode.GetResizeMethods() is not (ResizeMethod methodBeforeResizer, ResizeMethod methodAfterResizer))
         {
             return 0;
         }
 
-        if (indexOfCurrentResize == resizeElements.Count - 1)
+        ListSlice<T> elementsBeforeResizer = resizeElements.CreateBackwardsSlice(indexOfCurrentResizer);
+        ListSlice<T> elementsAfterResizer = resizeElements.CreateForwardsSlice(indexOfCurrentResizer + 1);
+
+        if (requestedResizerPositionChange > 0)
         {
-            methodAfterResizer = ResizeMethod.ChangeStackSize;
+            double changeInStackSize = 0;
+            double remainingResizerPositionChange = requestedResizerPositionChange;
+            if (indexOfCurrentResizer == resizeElements.Count - 1 || flags.HasFlag(ResizeFlags.CanConsumeSpaceAfterStack))
+            {
+                double spaceToTakeAfterStack = Math.Min(spaceToExpandInto, requestedResizerPositionChange);
+                remainingResizerPositionChange -= spaceToTakeAfterStack;
+                spaceToExpandInto -= spaceToTakeAfterStack;
+            }
+            if (remainingResizerPositionChange > 0)
+            {
+                double elementsAfterResizerSizeReduction = -methodAfterResizer.RunMethod(elementsAfterResizer, resizeHarness, -remainingResizerPositionChange, spaceAfterResizer, spaceToExpandInto);
+                changeInStackSize -= elementsAfterResizerSizeReduction;
+                remainingResizerPositionChange -= elementsAfterResizerSizeReduction;
+            }
+            if (remainingResizerPositionChange > 0 && spaceToExpandInto > 0)
+            {
+                double spaceToTakeAfterResizer = Math.Min(spaceToExpandInto, requestedResizerPositionChange);
+                remainingResizerPositionChange -= spaceToTakeAfterResizer;
+                spaceToExpandInto -= spaceToTakeAfterResizer;
+            }
+
+            double successfulResizerPositionChange = requestedResizerPositionChange - remainingResizerPositionChange;
+
+            if (indexOfCurrentResizer > -1 && !flags.HasFlag(ResizeFlags.CanConsumeSpaceBeforeStack))
+            {
+                changeInStackSize += methodBeforeResizer.RunMethod(elementsBeforeResizer, resizeHarness, successfulResizerPositionChange, spaceBeforeResizer, spaceToExpandInto);
+            }
+
+            return changeInStackSize;
         }
-
-        if (indexOfCurrentResize == -1)
+        else if (requestedResizerPositionChange < 0)
         {
-            methodBeforeResizer = ResizeMethod.ChangeStackSize;
-        }
+            double changeInStackSize = 0;
+            double remainingResizerPositionReduction = -requestedResizerPositionChange;
+            if (indexOfCurrentResizer == -1 || flags.HasFlag(ResizeFlags.CanConsumeSpaceBeforeStack))
+            {
+                double spaceToTakeBeforeStack = Math.Min(spaceToExpandInto, remainingResizerPositionReduction);
+                remainingResizerPositionReduction -= spaceToTakeBeforeStack;
+                spaceToExpandInto -= spaceToTakeBeforeStack;
+            }
+            if (remainingResizerPositionReduction > 0)
+            {
+                double elementsBeforeResizerSizeReduction = -methodBeforeResizer.RunMethod(elementsBeforeResizer, resizeHarness, -remainingResizerPositionReduction, spaceBeforeResizer, spaceToExpandInto);
+                changeInStackSize -= elementsBeforeResizerSizeReduction;
+                remainingResizerPositionReduction -= elementsBeforeResizerSizeReduction;
+            }
+            if (remainingResizerPositionReduction > 0 && spaceToExpandInto > 0)
+            {
+                double spaceToTakeBeforeStack = Math.Min(spaceToExpandInto, remainingResizerPositionReduction);
+                remainingResizerPositionReduction -= spaceToTakeBeforeStack;
+                spaceToExpandInto -= spaceToTakeBeforeStack;
+            }
 
-        Span<ResizeMethod> methodsAfterResizer = flags.HasFlag(ResizeFlags.CanConsumeSpaceAfterStack) ? [ResizeMethod.ChangeStackSize, methodAfterResizer] : [methodAfterResizer];
+            double successfulResizerPositionChange = requestedResizerPositionChange + remainingResizerPositionReduction;
 
-        Span<ResizeMethod> methodsBeforeResizer = flags.HasFlag(ResizeFlags.CanConsumeSpaceBeforeStack) ? [ResizeMethod.ChangeStackSize, methodBeforeResizer] : [methodBeforeResizer];
+            if (indexOfCurrentResizer < resizeElements.Count - 1 && !flags.HasFlag(ResizeFlags.CanConsumeSpaceAfterStack))
+            {
+                changeInStackSize += methodAfterResizer.RunMethod(elementsAfterResizer, resizeHarness, -successfulResizerPositionChange, spaceAfterResizer, spaceToExpandInto);
+            }
 
-        ListSlice<T> elementsBeforeResizer = resizeElements.CreateBackwardsSlice(indexOfCurrentResize);
-        ListSlice<T> elementsAfterResizer = resizeElements.CreateForwardsSlice(indexOfCurrentResize + 1);
-
-        if (currentResizeAmount > 0)
-        {
-            double successfulResizeAmount = -methodsAfterResizer.RunMethods(elementsAfterResizer, resizeHarness, -currentResizeAmount, spaceAfterResizer, spaceToExpandInto);
-            return methodsBeforeResizer.RunMethods(elementsBeforeResizer, resizeHarness, successfulResizeAmount, spaceBeforeResizer, spaceToExpandInto);
-        }
-        else if (currentResizeAmount < 0)
-        {
-            double successfulResizeAmount = methodsBeforeResizer.RunMethods(elementsBeforeResizer, resizeHarness, currentResizeAmount, spaceBeforeResizer, spaceToExpandInto);
-            return methodsAfterResizer.RunMethods(elementsAfterResizer, resizeHarness, -successfulResizeAmount, spaceAfterResizer, spaceToExpandInto);
+            return changeInStackSize;
         }
 
         return 0;
